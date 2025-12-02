@@ -2,13 +2,13 @@ import { ApolloProvider } from '@apollo/client/react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import client from './config/apolloClient';
-
+import CharacterList from './components/CharcterList';
 
 export default function App() {
   return (
     <ApolloProvider client={client}>
       <View style={styles.container}>
-        <Text>Open up App.tsx to start working on your app!</Text>
+        <CharacterList />
         <StatusBar style="auto" />
       </View>
     </ApolloProvider>

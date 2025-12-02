@@ -1,38 +1,37 @@
 import { useQuery } from "@apollo/client/react";
-import { FlatList, Text, View } from "react-native"
+import { FlatList, Text, View, Image, StyleSheet } from "react-native"
 import { GET_CHARACTERS } from "../queries/characters";
 
-interface CharcterListProps {
-    characters: {
-        id: string;
-        name: string;
-        image: string;
-    }[];
+interface Character {
+    id: string;
+    name: string;
+    image: string;
 }
 
-interface CharcterData {
+interface CharacterData {
     characters: {
-        results: CharcterListProps[]
+        results: Character[]
     }
 }
 
-const CharcterList = () => {
+const CharacterList = () => {
 
-    const { data } = useQuery<CharcterData>(GET_CHARACTERS)
+    const { data, } = useQuery<CharacterData>(GET_CHARACTERS)
+
+
+
 
     const characters = data?.characters.results
-
 
     return (
         <View style={styles.container}>
             <FlatList
                 data={characters}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View>
                         <Text style={styles.name}>{item.name}</Text>
-                        <Image style={styles.image} source={{ uri: item.image }}
-
-                        />
+                        <Image style={styles.image} source={{ uri: item.image }} />
                     </View>
                 )}
             />
@@ -56,3 +55,5 @@ const styles = StyleSheet.create({
         height: 200,
     },
 })
+
+export default CharacterList;
