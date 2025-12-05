@@ -25,9 +25,12 @@ interface CharacterData {
 const CharacterList = () => {
     const { currentPage, setCurrentPage } = useContext(ApolloContext)
 
+
+    const apiPage = Math.ceil(currentPage / 2)
+
     const { data, loading, error } = useQuery<CharacterData>(GET_CHARACTERS_Pagination, {
         variables: {
-            page: currentPage
+            page: apiPage
         }
     })
 
@@ -35,17 +38,21 @@ const CharacterList = () => {
     if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>
 
     const { pages, next, prev } = data?.characters.info || {}
-    const characters = data?.characters.results
+    const allCharacters = data?.characters.results || []
+
+    const isFirstHalf = currentPage % 2 !== 0
+    const characters = isFirstHalf ? allCharacters.slice(0, 10) : allCharacters.slice(10, 20)
 
     const handleNextPage = () => {
-        if (next) {
-            setCurrentPage(next)
+
+        if (isFirstHalf || next) {
+            setCurrentPage(currentPage + 1)
         }
     }
 
     const handlePrevPage = () => {
-        if (prev) {
-            setCurrentPage(prev)
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1)
         }
     }
 
@@ -64,8 +71,8 @@ const CharacterList = () => {
                     <View style={styles.pagination}>
                         <TouchableOpacity
                             onPress={handlePrevPage}
-                            disabled={!prev}
-                            style={[styles.button, !prev && styles.disabled]}
+                            disabled={currentPage === 1}
+                            style={[styles.button, currentPage === 1 && styles.disabled]}
                         >
                             <Text style={styles.buttonText}>Prev</Text>
                         </TouchableOpacity>
@@ -74,8 +81,8 @@ const CharacterList = () => {
 
                         <TouchableOpacity
                             onPress={handleNextPage}
-                            disabled={!next}
-                            style={[styles.button, !next && styles.disabled]}
+                            disabled={!isFirstHalf && !next}
+                            style={[styles.button, (!isFirstHalf && !next) && styles.disabled]}
                         >
                             <Text style={styles.buttonText}>Next</Text>
                         </TouchableOpacity>
