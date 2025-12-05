@@ -3,10 +3,15 @@ import { gql } from "@apollo/client";
 
 
 
-const GET_CHARACTERS = gql`
+export const GET_CHARACTERS_Pagination = gql`
 
 query GetCharacters{
 characters{
+    info{
+        pages
+        next
+        prev
+    }
     results{
         id
         name

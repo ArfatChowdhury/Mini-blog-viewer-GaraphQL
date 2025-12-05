@@ -18,9 +18,6 @@ const CharacterList = () => {
 
     const { data, } = useQuery<CharacterData>(GET_CHARACTERS)
 
-
-
-
     const characters = data?.characters.results
 
     return (
@@ -29,7 +26,7 @@ const CharacterList = () => {
                 data={characters}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <View>
+                    <View style={styles.item}>
                         <Text style={styles.name}>{item.name}</Text>
                         <Image style={styles.image} source={{ uri: item.image }} />
                     </View>
@@ -42,9 +39,11 @@ const CharacterList = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: 'black',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 10,
+
     },
     name: {
         fontSize: 20,
@@ -54,6 +53,11 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
     },
+    item: {
+        gap: 10,
+        borderColor: 'white',
+        borderWidth: 1,
+    }
 })
 
 export default CharacterList;
