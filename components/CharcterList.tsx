@@ -1,6 +1,9 @@
 import { useQuery } from "@apollo/client/react";
-import { FlatList, Text, View, Image, StyleSheet } from "react-native"
-import { GET_CHARACTERS } from "../queries/characters";
+import { FlatList, Text, View, Image, StyleSheet, TouchableOpacity } from "react-native"
+import { GET_CHARACTERS_Pagination } from "../queries/characters";
+import { useContext } from "react";
+import ApolloContext from "../Context/apolloContext";
+
 
 interface Character {
     id: string;
@@ -11,14 +14,40 @@ interface Character {
 interface CharacterData {
     characters: {
         results: Character[]
+        info: {
+            pages: number;
+            next: number | null;
+            prev: number | null;
+        }
     }
 }
 
 const CharacterList = () => {
+    const { currentPage, setCurrentPage } = useContext(ApolloContext)
 
-    const { data, } = useQuery<CharacterData>(GET_CHARACTERS)
+    const { data, loading, error } = useQuery<CharacterData>(GET_CHARACTERS_Pagination, {
+        variables: {
+            page: currentPage
+        }
+    })
 
+    if (loading) return <Text style={styles.loadingText}>Loading...</Text>
+    if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>
+
+    const { pages, next, prev } = data?.characters.info || {}
     const characters = data?.characters.results
+
+    const handleNextPage = () => {
+        if (next) {
+            setCurrentPage(next)
+        }
+    }
+
+    const handlePrevPage = () => {
+        if (prev) {
+            setCurrentPage(prev)
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -29,6 +58,27 @@ const CharacterList = () => {
                     <View style={styles.item}>
                         <Text style={styles.name}>{item.name}</Text>
                         <Image style={styles.image} source={{ uri: item.image }} />
+                    </View>
+                )}
+                ListFooterComponent={() => (
+                    <View style={styles.pagination}>
+                        <TouchableOpacity
+                            onPress={handlePrevPage}
+                            disabled={!prev}
+                            style={[styles.button, !prev && styles.disabled]}
+                        >
+                            <Text style={styles.buttonText}>Prev</Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.pageNumber}>{currentPage}</Text>
+
+                        <TouchableOpacity
+                            onPress={handleNextPage}
+                            disabled={!next}
+                            style={[styles.button, !next && styles.disabled]}
+                        >
+                            <Text style={styles.buttonText}>Next</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
             />
@@ -43,11 +93,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,
-
     },
     name: {
         fontSize: 20,
         fontWeight: 'bold',
+        color: 'white',
     },
     image: {
         width: 200,
@@ -57,6 +107,41 @@ const styles = StyleSheet.create({
         gap: 10,
         borderColor: 'white',
         borderWidth: 1,
+        marginBottom: 20,
+        padding: 10,
+        alignItems: 'center',
+    },
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 20,
+        paddingVertical: 20,
+    },
+    button: {
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 5,
+    },
+    disabled: {
+        opacity: 0.5,
+    },
+    buttonText: {
+        color: 'black',
+        fontWeight: 'bold',
+    },
+    pageNumber: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    loadingText: {
+        color: 'white',
+        marginTop: 50,
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 50,
     }
 })
 
