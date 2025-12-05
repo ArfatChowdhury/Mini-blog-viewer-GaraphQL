@@ -1,8 +1,7 @@
 import { InMemoryCache, ApolloClient, HttpLink, makeVar } from "@apollo/client";
 
 
-const currentPage = makeVar(1)
-
+export const currentPageVar = makeVar(1)
 
 const client = new ApolloClient({
 
